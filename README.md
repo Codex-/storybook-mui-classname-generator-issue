@@ -1,27 +1,29 @@
-# React + TypeScript + Vite
+# Storybook MUI custom classname generation issue
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+- 📄 Discussion: <https://github.com/storybookjs/storybook/discussions/24350>
 
-Currently, two official plugins are available:
+This repository exists to demonstrate an issue when using [MUIs ClassName generator customisation](https://mui.com/material-ui/experimental-api/classname-generator/) with storybook.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Issue
 
-## Expanding the ESLint configuration
+When viewing storybook stories via statically generated builds, the import order within `preview.tsx` is not respected, which in the case of MUI classname customisation causes styling and clasname operations to happen out of order resulting in mixed styles.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+The storybook static builds work correctly if the import that customises the Mui ClassName generation is disabled:
 
-- Configure the top-level `parserOptions` property like this:
+`preview.tsx`
 
-```js
-   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-   },
+```tsx
+import "./MuiClassNameSetup"; // Comment this line out to 'fix' storybook static builds
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+### Expected
+
+Here we can see the expected styles being applied correctly, which can be seen when running storybook via `npm run storybook`
+
+![Expected](docs/expected.png)
+
+### Actual
+
+This is the rendered content looks like when serving the statically generated builds which can be seen via `npm run storybook:static`
+
+![Actual](docs/actual.png)
